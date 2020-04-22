@@ -37,6 +37,17 @@ bool consume(char *op) {
     return true;
 }
 
+Token *consume_ident() {
+    Token *tk = NULL;
+    if (token->kind != TK_IDENT) {
+        return tk;
+    }
+    tk = calloc(1, sizeof(Token));
+    tk = token;
+    token = token->next;
+    return tk;
+}
+
 // 次のトークンが期待している記号のときには、トークンを1つ読み進める
 // それ以外の場合にはエラーを報告する
 void expect(char *op) {
@@ -84,6 +95,14 @@ Node *primary() {
     if (consume("(")) {
         Node *node = expr();
         expect(")");
+        return node;
+    }
+
+    Token *tok = consume_ident();
+    if (tok) {
+        Node *node = calloc(1, sizeof(Node));
+        node->kind = ND_LVAR;
+        node->offset = (tok->str[0] - 'a' + 1) * 8;
         return node;
     }
 
@@ -171,8 +190,31 @@ Node *equality() {
     }
 }
 
+Node *assign() {
+    Node *node = equality();
+    if (consume("=")) {
+        node = new_node(ND_ASSIGN, node, assign());
+    }
+    return node;
+}
+
 Node *expr() {
-    return equality();
+    return assign();
+}
+
+Node *stmt() {
+    Node *node = expr();
+    expect(";");
+    return node;
+}
+
+void program() {
+    int i = 0;
+    while (!at_eof()) {
+        code[i++] = stmt();
+    }
+    code[i] = NULL;
+    
 }
 
 // 新しいトークンを作成してcurに繋げる
@@ -187,14 +229,23 @@ Token *new_token(TokenKind kind, Token *cur, char *str, int str_len) {
 }
 
 // 入力文字列pをトークナイズしてそれを返す
-Token *tokenize(char *p) {
+void tokenize() {
     Token head;
     head.next = NULL;
     Token *cur = &head;
+    char *p = user_input;
 
     while (*p) {
         // 空白文字をスキップ
         if (isspace(*p)) {
+            p++;
+            continue;
+        }
+
+        if (   ('a' <= *p)
+            && ('z' >= *p)) {
+
+            cur = new_token(TK_IDENT, cur, p, 1);
             p++;
             continue;
         }
@@ -217,7 +268,9 @@ Token *tokenize(char *p) {
             || (*p == '(')
             || (*p == ')')
             || (*p == '<')
-            || (*p == '>')) {
+            || (*p == '>')
+            || (*p == ';')
+            || (*p == '=')) {
 
             cur = new_token(TK_RESERVED, cur, p, 1);
             p++;
@@ -234,5 +287,5 @@ Token *tokenize(char *p) {
     }
 
     new_token(TK_EOF, cur, p, 0);
-    return head.next;
+    token = head.next;
 }
