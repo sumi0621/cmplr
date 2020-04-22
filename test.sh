@@ -23,6 +23,15 @@ assert 41 " 12 + 34 - 5 "
 assert 47 '5+6*7'
 assert 15 '5*(9-6)'
 assert 4  '(3+5)/2'
-assert 10 '-10++20'
+assert 10 '-10+20'
+assert 1  "10+20 == 15+15"
+assert 1  "10+20 != 1"
+assert 0  "1 == 0"
+assert 1  "2 > 1"
+assert 1  "1*2 < 3 * 2 + 1"
+assert 1  "1 * 2 >= 1 * 2"
+assert 1  "1 * 3 >= 2"
+assert 1  "1 + 2 <= 3"
+assert 1  "1 + 2 <= 4"
 
 echo OK
