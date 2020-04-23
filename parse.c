@@ -27,7 +27,8 @@ void error(char *fmt, ...) {
 // 次のトークンが期待している記号のときには、トークンを1つ読み進めて
 // 真を返す。それ以外の場合には偽を返す。
 bool consume(char *op) {
-    if (   (token->kind != TK_RESERVED)
+    if (   (   (token->kind != TK_RESERVED)
+            && (token->kind != TK_RETURN))
         || (strlen(op) != token->len)
         || (memcmp(token->str, op, token->len))) {
 
@@ -233,8 +234,20 @@ Node *expr() {
 }
 
 Node *stmt() {
-    Node *node = expr();
-    expect(";");
+    Node *node;
+
+    if (consume("return")) {
+        node = calloc(1, sizeof(Node));
+        node->kind = ND_RETURN;
+        node->lhs = expr();
+    }
+    else {
+        node = expr();
+    }
+
+    if (!consume(";")) {
+        error_at(token->str, "';'ではないトークンです");
+    }
     return node;
 }
 
@@ -258,6 +271,12 @@ Token *new_token(TokenKind kind, Token *cur, char *str, int str_len) {
     return tok;
 }
 
+int is_alnum(char c) {
+    return (   (isalpha(c)
+            || (isdigit(c)
+            || (c == '_'))));
+}
+
 // 入力文字列pをトークナイズしてそれを返す
 void tokenize() {
     Token head;
@@ -269,6 +288,14 @@ void tokenize() {
         // 空白文字をスキップ
         if (isspace(*p)) {
             p++;
+            continue;
+        }
+
+        if (   (strncmp(p, "return", 6) == 0)
+            && (!is_alnum(p[6]))) {
+
+            cur = new_token(TK_RETURN, cur, p, 6);
+            p += 6;
             continue;
         }
 
