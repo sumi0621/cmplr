@@ -38,5 +38,7 @@ assert 11 "abc = 1; foooo_11133 = 10; abc + foooo_11133;"
 assert 1  "return 1;"
 assert 9 "return 1 + 2 * 4;"
 assert 11 "abc = 1; foooo_11133 = 10; aaa = abc + foooo_11133;return aaa;"
+assert 2  "if(1 == 1)2;"
+assert 4  "if (2 == 2)if(1 != 3)4;"
 
 echo OK

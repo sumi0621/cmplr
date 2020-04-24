@@ -28,7 +28,8 @@ void error(char *fmt, ...) {
 // 真を返す。それ以外の場合には偽を返す。
 bool consume(char *op) {
     if (   (   (token->kind != TK_RESERVED)
-            && (token->kind != TK_RETURN))
+            && (token->kind != TK_RETURN)
+            && (token->kind != TK_IF))
         || (strlen(op) != token->len)
         || (memcmp(token->str, op, token->len))) {
 
@@ -241,6 +242,15 @@ Node *stmt() {
         node->kind = ND_RETURN;
         node->lhs = expr();
     }
+    else if (consume("if")) {
+        expect("(");
+        node = calloc(1, sizeof(Node));
+        node->kind = ND_IF;
+        node->lhs = expr();
+        expect(")");
+        node->rhs = stmt();
+        return node;
+    }
     else {
         node = expr();
     }
@@ -296,6 +306,14 @@ void tokenize() {
 
             cur = new_token(TK_RETURN, cur, p, 6);
             p += 6;
+            continue;
+        }
+
+        if (   (strncmp(p, "if", 2) == 0)
+            && (!is_alnum(p[2]))) {
+
+            cur = new_token(TK_IF, cur, p, 2);
+            p += 2;
             continue;
         }
 

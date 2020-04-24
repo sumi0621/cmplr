@@ -1,5 +1,7 @@
 #include "cmplr.h"
 
+static int nLabel = 0;
+
 void gen_lval(Node *node) {
     if (node->kind != ND_LVAR) {
         error("代入の左辺値が変数ではありません");
@@ -11,6 +13,7 @@ void gen_lval(Node *node) {
 }
 
 void gen(Node *node) {
+    int lbl = nLabel;
     switch (node->kind) {
         case ND_NUM:
             printf("  push %d\n", node->val);
@@ -36,6 +39,15 @@ void gen(Node *node) {
             printf("  mov rsp, rbp\n");
             printf("  pop rbp\n");
             printf("  ret\n");
+            return;
+        case ND_IF:
+            nLabel++;
+            gen(node->lhs);
+            printf("  pop rax\n");
+            printf("  cmp rax, 0\n");
+            printf("  je .Lend%d\n", lbl);
+            gen(node->rhs);
+            printf(".Lend%d:\n", lbl);
             return;
     }
 
