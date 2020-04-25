@@ -57,6 +57,7 @@ typedef enum {
     ND_LVAR,    // ローカル変数
     ND_RETURN,  // return
     ND_IF,      // if文
+    ND_ELSE,    // else
     ND_TRUE,
 } NodeKind;
 

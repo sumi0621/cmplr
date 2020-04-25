@@ -41,5 +41,7 @@ assert 11 "abc = 1; foooo_11133 = 10; aaa = abc + foooo_11133;return aaa;"
 assert 2  "if(1 == 1)2;"
 assert 4  "if (2 == 2)if(1 != 3)4;"
 assert 3  "a=3;if(1 ==2)a=4;return a;"
+assert 2  "if(1 ==2)return 1;else return 2;"
+assert 1  "a = 2;if(a == 3)return 10;else return a - 1;"
 
 echo OK

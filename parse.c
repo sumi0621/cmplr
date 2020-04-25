@@ -249,6 +249,14 @@ Node *stmt() {
         node->lhs = expr();
         expect(")");
         node->rhs = stmt();
+        if (consume("else")) {
+            Node *node2;
+            node2 = calloc(1, sizeof(Node));
+            node2->lhs = node->rhs;
+            node->rhs = node2;
+            node2->kind = ND_ELSE;
+            node2->rhs = stmt();
+        }
         return node;
     }
     else {
@@ -314,6 +322,14 @@ void tokenize() {
 
             cur = new_token(TK_IF, cur, p, 2);
             p += 2;
+            continue;
+        }
+
+        if (   (strncmp(p, "else", 4) == 0)
+            && (!is_alnum(p[4]))) {
+
+            cur = new_token(TK_RESERVED, cur, p, 4);
+            p += 4;
             continue;
         }
 
