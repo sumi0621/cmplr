@@ -259,6 +259,15 @@ Node *stmt() {
         }
         return node;
     }
+    else if (consume("while")) {
+        expect("(");
+        node = calloc(1, sizeof(Node));
+        node->kind = ND_WHILE;
+        node->lhs = expr();
+        expect(")");
+        node->rhs = stmt();
+        return node;
+    }
     else {
         node = expr();
     }
@@ -330,6 +339,14 @@ void tokenize() {
 
             cur = new_token(TK_RESERVED, cur, p, 4);
             p += 4;
+            continue;
+        }
+
+        if (   (strncmp(p, "while", 5) == 0)
+            && (!is_alnum(p[5]))) {
+
+            cur = new_token(TK_RESERVED, cur, p, 5);
+            p += 5;
             continue;
         }
 
