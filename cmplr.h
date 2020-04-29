@@ -59,6 +59,11 @@ typedef enum {
     ND_IF,      // if文
     ND_ELSE,    // else
     ND_WHILE,   // while
+    ND_FOR,     // for
+    ND_INIT,
+    ND_JUDGE,
+    ND_FOR_EXPR,
+    ND_FOR_STMS,
     ND_TRUE,
 } NodeKind;
 

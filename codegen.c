@@ -71,6 +71,25 @@ void gen(Node *node) {
             printf("  jmp .Lbegin%d\n", lbl);
             printf(".LWend%d:\n", lbl);
             return;
+        case ND_INIT:
+            nLabel++;
+            if (node->lhs != NULL) {
+                gen(node->lhs);
+            }
+            printf(".Lforbegin%d:\n", lbl);
+            if (node->rhs->lhs != NULL) {
+                gen(node->rhs->lhs);
+            }
+            printf("  pop rax\n");
+            printf("  cmp rax, 0\n");
+            printf("  je .Lforend%d\n", lbl);
+            gen(node->rhs->rhs->rhs);
+            if (node->rhs->rhs->lhs != NULL) {
+                gen(node->rhs->rhs->lhs);
+            }
+            printf("  jmp .Lforbegin%d\n", lbl);
+            printf(".Lforend%d:\n", lbl);
+            return;
     }
 
     gen(node->lhs);

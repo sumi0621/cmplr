@@ -44,5 +44,8 @@ assert 3  "a=3;if(1 ==2)a=4;return a;"
 assert 2  "if(1 ==2)return 1;else return 2;"
 assert 1  "a = 2;if(a == 3)return 10;else return a - 1;"
 assert 5  "a = 0;while(a < 5)a=a+1;return a;"
+assert 10 "for (a = 0; a < 10;) a = a + 1; return a;"
+assert 10 "for (a = 0; a < 10;a = a + 1) b ; return a;"
+assert 10 "a = 0;for (; a < 10;a = a + 1) b ; return a;"
 
 echo OK

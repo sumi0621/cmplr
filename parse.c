@@ -268,6 +268,41 @@ Node *stmt() {
         node->rhs = stmt();
         return node;
     }
+    else if (consume("for")) {
+        Node *node2, *node3;
+        expect("(");
+        node = calloc(1, sizeof(Node));
+        node->kind = ND_INIT;
+        if (strncmp(token->str, ";", 1) != 0) {
+            node->lhs = expr();
+        }
+        else {
+            node->lhs = NULL;
+        }
+        expect(";");
+        node2 = calloc(1, sizeof(Node));
+        node->rhs = node2;
+        node2->kind = ND_JUDGE;
+        if (strncmp(token->str, ";", 1) != 0) {
+            node2->lhs = expr();
+        }
+        else {
+            node2->lhs = NULL;
+        }
+        expect(";");
+        node3 = calloc(1, sizeof(Node));
+        node2->rhs = node3;
+        node3->kind = ND_FOR_EXPR;
+        if (strncmp(token->str, ")", 1) != 0) {
+            node3->lhs = expr();
+        }
+        else {
+            node3->lhs = NULL;
+        }
+        expect(")");
+        node3->rhs = stmt();
+        return node;
+    }
     else {
         node = expr();
     }
@@ -347,6 +382,14 @@ void tokenize() {
 
             cur = new_token(TK_RESERVED, cur, p, 5);
             p += 5;
+            continue;
+        }
+
+        if (   (strncmp(p, "for", 3) == 0)
+            && (!is_alnum(p[3]))) {
+
+            cur = new_token(TK_RESERVED, cur, p, 3);
+            p += 3;
             continue;
         }
 
